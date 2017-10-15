@@ -2,11 +2,12 @@ module Dropbox
   module API
 
     class Object
-      attr_accessor :client, :deleted
+      attr_accessor :client, :deleted, :response
 
       def initialize(response, client)
         self.deleted = false
         self.client  = client
+        self.response = response
       end
 
       def self.resolve_class(hash)
