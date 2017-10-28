@@ -59,17 +59,27 @@ Web-based Authorization
 -----------------------
 
 In order to create a Dropbox::API::Client object, you need to have the configuration set up for OAuth2.
-Second thing you need is to have the user authorize your app using OAuth2. Here's a short intro
-on how to do this:
+Second thing you need is to have the user authorize your app using OAuth2. Here's a short intro:
 
-##### OAuth2
 ```ruby
 consumer = ::Dropbox::API::OAuth2.consumer(:authorize)
-authorize_uri = consumer.authorize_url(client_id: Dropbox::API::Config.app_key, response_type: 'code')
-# Here the user goes to Dropbox, authorizes the app and is redirected, when
-# they return, extract the &code query string parameter
+authorize_uri = consumer.authorize_url(
+  client_id: Dropbox::API::Config.app_key,
+  response_type: 'code',
+  redirect_uri: 'http://example.com/callback'
+)
+```
+
+Your app would send the user to Dropbox via authorize_uri. There, the user
+authorizes your app and is redirected back to your site (ie, 'http://example.com/callback').
+Upon return, your app needs to extract the '&code' query string parameter. Here's a Rails example:
+
+```ruby
 consumer = ::Dropbox::API::OAuth2.consumer(:main)
-access_token = consumer.auth_code.get_token(params[:code])
+access_token = consumer.auth_code.get_token(
+  params[:code],
+  redirect_uri: 'http://example.com/callback'
+)
 ```
 
 Now that you have an authenticated OAuth2 access token, you can create a new instance of the Dropbox::API::Client, like this:
